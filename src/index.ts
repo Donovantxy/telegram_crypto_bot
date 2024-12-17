@@ -1,12 +1,9 @@
-import { Bot, Context } from 'grammy';
+import { Bot, Context, webhookCallback } from 'grammy';
 import * as dotenv from 'dotenv';
 import { Alert } from './alert';
-import { AlertPool, SimplePriceResp, tokenMapIds } from './models';
-import * as fs from 'fs';
 import { CoinGeckoService } from './coin-gecko.service';
-import { formattedPrice, trunkPrice } from './utilities';
 import { InfoPrice } from './info-price';
-import { createServer } from 'http';
+import express from 'express';
 
 dotenv.config();
 
@@ -46,9 +43,12 @@ setInterval(async () => {
   // alert.checkPricesAndReply();
 }, POLLING_TIME_IN_SEC * 1000); 
 
-const port = process.env.PORT || 3000;
-createServer((req, res) => {
-  bot.start();
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end('Bot is running...\n');
-}).listen(port);
+// bot.start();
+
+const app = express();
+app.use(express.json());
+app.use(webhookCallback(bot, 'express'));
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
+});
