@@ -13,14 +13,16 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.7.2",
+    "dotenv": "^16.4.7",
+    "grammy": "^1.33.0"
+  },
   "devDependencies": {
     "@grammyjs/types": "^3.17.0",
     "@types/node": "^22.10.1",
     "@uniswap/sdk": "^3.0.3",
-    "dotenv": "^16.4.7",
     "ethers": "^6.13.4",
-    "grammy": "^1.33.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "ts-node": "^10.9.2"
   }
 }
