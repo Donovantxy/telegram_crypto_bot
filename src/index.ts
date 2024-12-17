@@ -19,10 +19,6 @@ export enum InfoType {
 }
 
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
-bot.api.setWebhook("https://telegram-crypto-bot.herokuapp.com").then(() => {
-  console.log("Webhook set!");
-  process.exit(0);
-});
 
 const POLLING_TIME_IN_SEC = 5;
 const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);
