@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { CoinGeckoService } from './coin-gecko.service';
 import { formattedPrice, trunkPrice } from './utilities';
 import { InfoPrice } from './info-price';
+import { createServer } from 'http';
 
 dotenv.config();
 
@@ -45,5 +46,9 @@ setInterval(async () => {
   // alert.checkPricesAndReply();
 }, POLLING_TIME_IN_SEC * 1000); 
 
-bot.start();
-console.log('Bot is running...');
+const port = process.env.PORT || 3000;
+createServer((req, res) => {
+  bot.start();
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end('Bot is running...\n');
+}).listen(port);
