@@ -19,6 +19,7 @@ export enum InfoType {
 }
 
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
+console.log(222, process.env.TELEGRAM_BOT_TOKEN);
 
 const POLLING_TIME_IN_SEC = 5;
 const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);

@@ -13,7 +13,7 @@ export class InfoPrice {
 
   getInfoAndReply() {
     this.bot.command(InfoType.INFO, async (ctx) => {
-      console.log(111, ctx.message);
+      console.log(5500550055, ctx.message);
       if ( ctx.message ) {
         const idsFromMessage: string[] = ctx.message.text.split(/\s+/).slice(1);
         const idsToGetInfoFrom: string[] = [];
