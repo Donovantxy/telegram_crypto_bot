@@ -30,7 +30,7 @@ export class InfoPrice {
             if ( resp.length ) {
               resp.forEach(coin => {
                 replyFormatted += `• *${coin.name}* (${coin.symbol}) at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n\n`;
-              })  
+              });
               ctx.reply(replyFormatted, { parse_mode: 'Markdown' });
             }
           });
