@@ -19,6 +19,11 @@ export enum InfoType {
 }
 
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
+bot.api.setWebhook("https://telegram-crypto-bot.herokuapp.com").then(() => {
+  console.log("Webhook set!");
+  process.exit(0);
+});
+
 const POLLING_TIME_IN_SEC = 5;
 const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);
 const alert = new Alert(bot, apiService);
@@ -48,6 +53,7 @@ setInterval(async () => {
 const app = express();
 app.use(express.json());
 app.use(webhookCallback(bot, 'express'));
+
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
