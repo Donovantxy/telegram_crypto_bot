@@ -1,0 +1,21 @@
+{
+  "priceAlerts": {
+    "btc": {
+      "alerts": [
+        {
+          "type": "above",
+          "tokenId": "bitcoin",
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          },
+          "messageText": "/above btc 99707",
+          "targetPrice": 1
+        }
+      ]
+    }
+  }
+}
