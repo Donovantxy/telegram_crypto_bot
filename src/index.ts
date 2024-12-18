@@ -1,45 +1,35 @@
 import { Bot, Context, InputFile } from 'grammy';
 import * as dotenv from 'dotenv';
-import { Alert } from './alert';
+import { AlertCommand } from './alert.command';
 import { CoinGeckoService } from './coin-gecko.service';
-import { InfoPrice } from './info-price';
+import { InfoPriceCommand } from './info-price.command';
 import { AlertType } from './models';
-import * as fs from 'fs';
+import { HelpCommand } from './help.command';
 
 dotenv.config();
 
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
 
-const POLLING_TIME_IN_SEC = 5;
+const POLLING_TIME_IN_SEC = 15;
 const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);
-const alert = new Alert(bot, apiService);
-const info = new InfoPrice(bot, apiService);
+const alert = new AlertCommand(bot, apiService);
+const info = new InfoPriceCommand(bot, apiService);
+const helpCommand = new HelpCommand(bot);
 
-bot.command('help', (ctx) => {
-  ctx.reply(
-`
-*Command List*
-/info btc sol ada - prints the price, and market cap for the listed tokens
-/above (or below) - sets an alert which gets triggered whenever that condition is met\n
-*Links*
-**[Pulsechain](https://www.pulsechain.com/)**
-**[Hex](https://hex.com/links)**
-**[Ethereum Gas tracker](https://etherscan.io/gastracker)**
-**[CoinMarketCap](https://coinmarketcap.com/charts/)**
-`,
-{ parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
 
-});
-bot.command('alerts_', (ctx) => {
+bot.command('alerts__', (ctx) => {
   ctx.replyWithDocument(
     new InputFile('./alert_pool.json'),
     {
       caption: 'Here is the current state of alert_pool.json.',
     });
 });
-alert.setPriceAlert(AlertType.PRICE_ABOVE);
-alert.setPriceAlert(AlertType.PRICE_BELOW);
-info.getInfoAndReply();
+helpCommand.onHelp();
+alert.onSetPriceAlert(AlertType.PRICE_ABOVE);
+alert.onSetPriceAlert(AlertType.PRICE_BELOW);
+alert.onListAlerts();
+info.onTokenPrice();
+info.onGasPrice();
 
 // bot.on('message', async (ctx) => {
 //   const countMember = await ctx.getChatMemberCount();
@@ -53,7 +43,7 @@ info.getInfoAndReply();
 // });
 
 setInterval(async () => {
-  alert.checkPricesAndReply();
+  alert.onCheckPrices();
 }, POLLING_TIME_IN_SEC * 1000); 
 
 bot.start();

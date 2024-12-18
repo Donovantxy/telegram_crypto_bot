@@ -3,12 +3,12 @@ import { User } from '@grammyjs/types';
 export enum AlertType {
   PRICE_ABOVE = 'above',
   PRICE_BELOW = 'below',
-  GAS_PRICE = 'gas',
   GAS_BELOW = 'gas_below',
 }
-
+  
 export enum InfoType {
   INFO = 'info',
+  GAS_PRICE = 'gas',
 }
 
 export interface AlertPool {

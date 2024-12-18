@@ -3,14 +3,14 @@ import { CoinGeckoService } from './coin-gecko.service';
 import { tokenMapIds, InfoType } from './models';
 import { formattedPrice, trunkPrice } from './utilities';
 
-export class InfoPrice {
+export class InfoPriceCommand {
 
   constructor(
     private bot: Bot<Context>,
     private _coinGeckoService: CoinGeckoService
   ) {}
 
-  getInfoAndReply() {
+  onTokenPrice() {
     this.bot.command(InfoType.INFO, async (ctx) => {
       if ( ctx.message ) {
         const idsFromMessage: string[] = ctx.message.text.split(/\s+/).slice(1);
@@ -42,6 +42,10 @@ export class InfoPrice {
         }
       }
     });
+  }
+
+  onGasPrice() {
+    
   }
 
 }

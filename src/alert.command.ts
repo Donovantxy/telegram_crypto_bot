@@ -5,7 +5,7 @@ import { CoinGeckoService } from './coin-gecko.service';
 import { AlertType } from './models';
 import { formattedPrice } from './utilities';
 
-export class Alert {
+export class AlertCommand {
   
   get alertPoolFilePath(): string {
     return this._alertPoolFilePath;
@@ -27,7 +27,7 @@ export class Alert {
     this.init();
   }
 
-  setPriceAlert(command: AlertType) {
+  onSetPriceAlert(command: AlertType) {
     this.bot.command(command, async (ctx) => {
       const message = ctx.message
       const args = message?.text?.split(/\s+/ig);
@@ -65,7 +65,6 @@ export class Alert {
             console.error(err);
           }
 
-          // ctx.reply(`@${ctx.from?.username}`);
           ctx.reply(`*${tokenSymbolOrId}* alert is set for a price ${command} $${targetPrice}`, { parse_mode: 'Markdown' });
         } else {
           ctx.reply(`Wrong alert format. Eg.: /above btc 65000, or /below cardano 1.25`);
@@ -74,42 +73,67 @@ export class Alert {
     });
   }
 
-  checkPricesAndReply() {
+  onCheckPrices() {
     try {
-      const alertPoolFile: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
       // console.log(JSON.stringify(alertPoolFile, null, 3));
-      if ( alertPoolFile && alertPoolFile.priceAlerts && Object.keys(alertPoolFile.priceAlerts).length ) {
-        this._coinGeckoService.getSimplePrice(Object.keys(alertPoolFile.priceAlerts), (prices: SimplePriceResp) => {
-          if ( Object.keys(prices).length ) {
-            for ( const tokenKey of Object.keys(prices) ) {
-              if ( alertPoolFile.priceAlerts[tokenKey] ) {
-                for (let i=0; i<alertPoolFile.priceAlerts[tokenKey].alerts.length;) {
-                  const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPoolFile.priceAlerts[tokenKey].alerts[i]);
-                  if ( gotTriggered ) {
-                    alertPoolFile.priceAlerts[tokenKey].alerts.splice(i, 1);
-                    if ( alertPoolFile.priceAlerts[tokenKey].alerts.length === 0 ) {
-                      break;
+      if ( alertPool && alertPool.priceAlerts && Object.keys(alertPool.priceAlerts).length ) {
+        let anyAlert = false;
+        for ( let tokenAlert of Object.values(alertPool.priceAlerts) ) {
+          if ( tokenAlert.alerts.length ) {
+            anyAlert = true;
+            break;
+          }
+        }
+        if ( anyAlert ) {
+          this._coinGeckoService.getSimplePrice(Object.keys(alertPool.priceAlerts), (prices: SimplePriceResp) => {
+            console.log(prices);
+            if ( Object.keys(prices).length ) {
+              for ( const tokenKey of Object.keys(prices) ) {
+                if ( alertPool.priceAlerts[tokenKey] ) {
+                  for (let i=0; i<alertPool.priceAlerts[tokenKey].alerts.length;) {
+                    const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPool.priceAlerts[tokenKey].alerts[i]);
+                    if ( gotTriggered ) {
+                      alertPool.priceAlerts[tokenKey].alerts.splice(i, 1);
+                      if ( alertPool.priceAlerts[tokenKey].alerts.length === 0 ) {
+                        break;
+                      }
+                    } else {
+                      i++;
                     }
-                  } else {
-                    i++;
                   }
                 }
               }
+              try {
+                fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+              } catch ( err ) {
+                console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
+                console.error(err);
+              }
             }
-            try {
-              fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPoolFile));
-            } catch ( err ) {
-              console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
-              console.error(err);
-            }
-          }
-        });
-        // console.log('%cTokenList', 'color:yellow;font-size:16px', Object.keys(alertPoolFile.priceAlerts));
-        // console.log('%cALERTS POOL\n', 'color:blue;font-size:16px', alertPoolFile);
+          });
+        }
       }
     } catch( err ) {
       console.error(err);
     }
+  }
+
+  onListAlerts() {
+    this.bot.command('alerts', (ctx) => {
+      const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      let reply = '*List Alerts*\n';
+      Object.entries(alertPool.priceAlerts).forEach(entry => {
+        for (const alert of entry[1].alerts) {
+          if ( alert.chatId === ctx.chatId ) {
+            reply += `• ${alert.type} `;
+            reply += `*${tokenMapIds.find(tm => tm.id === entry[0])?.symbols[0].toUpperCase() || alert.tokenId}* `;
+            reply += `${formattedPrice(alert.targetPrice)}\n`;
+          }
+        }
+      })
+      ctx.reply(reply, { parse_mode: 'Markdown' });
+    });
   }
 
   private init() {
@@ -125,7 +149,6 @@ export class Alert {
         this._alerts = { priceAlerts: { }}
       }
     } catch( err ) {
-      console.error(err);
       this._alerts = { priceAlerts: { }};
       try {
         fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
@@ -141,7 +164,7 @@ export class Alert {
   ): boolean {
     if ( priceAlert.type === AlertType.PRICE_ABOVE && currentPrice > priceAlert.targetPrice 
       || priceAlert.type === AlertType.PRICE_BELOW && currentPrice < priceAlert.targetPrice ) {
-      const tokenTitle = tokenMapIds.find(tokenMap => tokenMap.id === priceAlert.tokenId)?.symbols[0] || priceAlert.tokenId;
+      const tokenTitle = tokenMapIds.find(tokenMap => tokenMap.id === priceAlert.tokenId)?.symbols[0].toUpperCase() || priceAlert.tokenId;
       const msgTag = priceAlert.from ? `${priceAlert.from.username || priceAlert.from.first_name}\n` : '';
       this.bot.api.sendMessage(
         priceAlert.chatId!,
