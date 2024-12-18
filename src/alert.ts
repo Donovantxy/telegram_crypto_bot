@@ -77,6 +77,7 @@ export class Alert {
   checkPricesAndReply() {
     try {
       const alertPoolFile: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      console.log(JSON.stringify(alertPoolFile, null, 3));
       if ( alertPoolFile && alertPoolFile.priceAlerts && Object.keys(alertPoolFile.priceAlerts).length ) {
         this._coinGeckoService.getSimplePrice(Object.keys(alertPoolFile.priceAlerts), (prices: SimplePriceResp) => {
           if ( Object.keys(prices).length ) {

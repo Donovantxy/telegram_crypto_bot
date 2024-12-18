@@ -1,9 +1,10 @@
-import { Bot, Context, webhookCallback } from 'grammy';
+import { Bot, Context } from 'grammy';
 import * as dotenv from 'dotenv';
 import { Alert } from './alert';
 import { CoinGeckoService } from './coin-gecko.service';
 import { InfoPrice } from './info-price';
 import { AlertType } from './models';
+import * as fs from 'fs';
 
 dotenv.config();
 
@@ -15,7 +16,6 @@ const alert = new Alert(bot, apiService);
 const info = new InfoPrice(bot, apiService);
 
 bot.command('help', (ctx) => {
-
   ctx.reply(
 `
 *Command List*
@@ -29,6 +29,10 @@ bot.command('help', (ctx) => {
 `,
 { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
 
+});
+bot.command('alerts', (ctx) => {
+  const fileContent = fs.readFileSync('./src/alert_pool.json', 'utf8');
+  ctx.reply(JSON.stringify(JSON.parse(fileContent), null, 2), { parse_mode: 'Markdown' });
 });
 alert.setPriceAlert(AlertType.PRICE_ABOVE);
 alert.setPriceAlert(AlertType.PRICE_BELOW);
