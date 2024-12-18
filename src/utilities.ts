@@ -1,13 +1,16 @@
-export const formattedPrice = (price: number): string => {
+export const formattedPrice = (price: number, maxFractionDigits?: number): string => {
   let maximumFractionDigits = 0;
   switch ( true ) {
     case price <= 0.00009:
-      maximumFractionDigits = 6
+      maximumFractionDigits = 7
       break;
     case price <= 0.0009:
-      maximumFractionDigits = 5
+      maximumFractionDigits = 6
       break;
     case price <= 0.009:
+      maximumFractionDigits = 5
+      break;
+    case price <= 0.09:
       maximumFractionDigits = 4
       break;
     case price < 1:
@@ -16,8 +19,16 @@ export const formattedPrice = (price: number): string => {
     case price >= 1 && price < 10:
       maximumFractionDigits = 2
       break;
+    case price >= 10 && price < 100:
+      maximumFractionDigits = 1
+      break;
   }
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits, minimumFractionDigits: 0 }).format(price);
+  return new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: 'USD', 
+    maximumFractionDigits: maxFractionDigits || maximumFractionDigits, 
+    minimumFractionDigits: 0 
+  }).format(price);
 }
 
 export const trunkPrice = (price: number): string => {

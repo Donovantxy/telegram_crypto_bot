@@ -1,5 +1,15 @@
 import { User } from '@grammyjs/types';
-import { AlertType } from '.';
+
+export enum AlertType {
+  PRICE_ABOVE = 'above',
+  PRICE_BELOW = 'below',
+  GAS_PRICE = 'gas',
+  GAS_BELOW = 'gas_below',
+}
+
+export enum InfoType {
+  INFO = 'info',
+}
 
 export interface AlertPool {
   priceAlerts: {
@@ -15,8 +25,8 @@ export class PriceAlert {
     public messageText = '',
     public tokenId: string,
     public targetPrice: number,
+    public chatId: number,
     public from?: User,
-    public chatId?: number,
     public name?: string,
     public image?: string
   ) {}
@@ -24,17 +34,19 @@ export class PriceAlert {
 
 export interface TokenMapId {
   id: string;
-  symbol: string;
+  symbols: string[];
 }
 
 export interface SimplePriceResp {
-  [tokenId: string]: {
-    usd: number,  
-    usd_market_cap?: number, 
-    usd_24h_vol?: number,  
-    usd_24h_change?: number, 
-    last_updated_at?: number,  
-  }
+  [tokenId: string]: SimplePrice;
+}
+
+export interface SimplePrice {
+  usd: number;
+  usd_market_cap?: number;
+  usd_24h_vol?: number;
+  usd_24h_change?: number;
+  last_updated_at?: number;
 }
 
 export interface CoinMarketDataResp {
@@ -67,25 +79,21 @@ export interface CoinMarketDataResp {
 }
 
 export const tokenMapIds: TokenMapId[] = [
- { id: 'bitcoin', symbol: 'btc' },
- { id: 'ethereum', symbol: 'eth' },
- { id: 'pulsechain', symbol: 'pls' },
- { id: 'cardano', symbol: 'ada' },
- { id: 'solana', symbol: 'sol' },
- { id: 'vechain', symbol: 'vet' },
- { id: 'gala', symbol: 'gala' },
- { id: 'ripple', symbol: 'xrp' },
- { id: 'polygon-ecosystem-token', symbol: 'polygon' },
- { id: 'polygon-ecosystem-token', symbol: 'pol' },
- { id: 'polygon-ecosystem-token', symbol: 'matic' },
- { id: 'stellar', symbol: 'xlm' },
- { id: 'dogecoin', symbol: 'doge' },
- { id: 'hex', symbol: 'ehex' },
- { id: 'hex-pulsechain', symbol: 'phex' },
- { id: 'hex-pulsechain', symbol: 'hex' },
- { id: 'the-sandbox', symbol: 'sand' },
- { id: 'crypto-com-chain', symbol: 'cronos' },
- { id: 'crypto-com-chain', symbol: 'cro' },
- { id: 'kaspa', symbol: 'kas' },
+ { id: 'bitcoin', symbols: ['btc'] },
+ { id: 'ethereum', symbols: ['eth'] },
+ { id: 'pulsechain', symbols: ['pls'] },
+ { id: 'cardano', symbols: ['ada'] },
+ { id: 'solana', symbols: ['sol'] },
+ { id: 'vechain', symbols: ['vet'] },
+ { id: 'gala', symbols: ['gala'] },
+ { id: 'ripple', symbols: ['xrp'] },
+ { id: 'polygon-ecosystem-token', symbols: ['pol', 'matic', 'polygon'] },
+ { id: 'stellar', symbols: ['xlm'] },
+ { id: 'dogecoin', symbols: ['doge'] },
+ { id: 'hex', symbols: ['ehex'] },
+ { id: 'hex-pulsechain', symbols: ['hex', 'phex'] },
+ { id: 'the-sandbox', symbols: ['sand'] },
+ { id: 'crypto-com-chain', symbols: ['cro', 'cronos'] },
+ { id: 'kaspa', symbols: ['kas'] },
 ];
 

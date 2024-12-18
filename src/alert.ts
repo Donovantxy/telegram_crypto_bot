@@ -1,8 +1,9 @@
 import { Bot, Context } from 'grammy';
-import { AlertPool, PriceAlert, SimplePriceResp, tokenMapIds} from './models';
+import { AlertPool, PriceAlert, SimplePrice, SimplePriceResp, tokenMapIds} from './models';
 import * as fs from 'fs';
 import { CoinGeckoService } from './coin-gecko.service';
-import { AlertType } from '.';
+import { AlertType } from './models';
+import { formattedPrice } from './utilities';
 
 export class Alert {
   
@@ -35,7 +36,7 @@ export class Alert {
         const targetPrice = Number(/\d{1,10}(\.\d{1,8})?/i.test(args[2]) ? args[2] : undefined);
         if ( tokenSymbolOrId && targetPrice && this._alerts.priceAlerts) {
           const tokenId = tokenMapIds
-          .find(map => map.id === tokenSymbolOrId || map.symbol === tokenSymbolOrId)?.id || tokenSymbolOrId;
+          .find(map => map.id === tokenSymbolOrId || map.symbols.includes(tokenSymbolOrId))?.id || tokenSymbolOrId;
           // check if an alert for a specific token already exist by a specific user
           const existingAlert = this._alerts.priceAlerts[tokenId]?.alerts
             .find(alert => alert.from?.id === ctx.from?.id && alert.type === command && alert.chatId === ctx.chatId);
@@ -49,8 +50,8 @@ export class Alert {
                 message?.text,
                 tokenId,
                 targetPrice,
-                ctx.from,
                 ctx.chatId,
+                ctx.from,
               ));
           } else {
             existingAlert.messageText = message?.text ?? '';
@@ -65,7 +66,7 @@ export class Alert {
           }
 
           // ctx.reply(`@${ctx.from?.username}`);
-          ctx.reply(`${tokenSymbolOrId} alert is set for a price ${command} $${targetPrice}`);
+          ctx.reply(`*${tokenSymbolOrId}* alert is set for a price ${command} $${targetPrice}`, { parse_mode: 'Markdown' });
         } else {
           ctx.reply(`Wrong alert format. Eg.: /above btc 65000, or /below cardano 1.25`);
         }
@@ -74,12 +75,33 @@ export class Alert {
   }
 
   checkPricesAndReply() {
-    // this.bot.api.sendMessage()
     try {
       const alertPoolFile: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
       if ( alertPoolFile && alertPoolFile.priceAlerts && Object.keys(alertPoolFile.priceAlerts).length ) {
-        this._coinGeckoService.getSimplePrice(Object.keys(alertPoolFile.priceAlerts), (res: SimplePriceResp) => {
-          console.log(111, res);
+        this._coinGeckoService.getSimplePrice(Object.keys(alertPoolFile.priceAlerts), (prices: SimplePriceResp) => {
+          if ( Object.keys(prices).length ) {
+            for ( const tokenKey of Object.keys(prices) ) {
+              if ( alertPoolFile.priceAlerts[tokenKey] ) {
+                for (let i=0; i<alertPoolFile.priceAlerts[tokenKey].alerts.length;) {
+                  const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPoolFile.priceAlerts[tokenKey].alerts[i]);
+                  if ( gotTriggered ) {
+                    alertPoolFile.priceAlerts[tokenKey].alerts.splice(i, 1);
+                    if ( alertPoolFile.priceAlerts[tokenKey].alerts.length === 0 ) {
+                      break;
+                    }
+                  } else {
+                    i++;
+                  }
+                }
+              }
+            }
+            try {
+              fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPoolFile));
+            } catch ( err ) {
+              console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
+              console.error(err);
+            }
+          }
         });
         // console.log('%cTokenList', 'color:yellow;font-size:16px', Object.keys(alertPoolFile.priceAlerts));
         // console.log('%cALERTS POOL\n', 'color:blue;font-size:16px', alertPoolFile);
@@ -110,6 +132,24 @@ export class Alert {
         console.error(err);
       }
     }
+  }
+
+  private replyPriceAlert(
+    currentPrice: number,
+    priceAlert: PriceAlert
+  ): boolean {
+    if ( priceAlert.type === AlertType.PRICE_ABOVE && currentPrice > priceAlert.targetPrice 
+      || priceAlert.type === AlertType.PRICE_BELOW && currentPrice < priceAlert.targetPrice ) {
+      const tokenTitle = tokenMapIds.find(tokenMap => tokenMap.id === priceAlert.tokenId)?.symbols[0] || priceAlert.tokenId;
+      const msgTag = priceAlert.from ? `${priceAlert.from.username || priceAlert.from.first_name}\n` : '';
+      this.bot.api.sendMessage(
+        priceAlert.chatId!,
+        `${msgTag}*${tokenTitle}* price is ${formattedPrice(currentPrice)} - ${priceAlert.type} ${formattedPrice(priceAlert.targetPrice)}`,
+        { parse_mode: 'Markdown' }
+      );
+      return true;
+    }
+    return false;
   }
 
 }

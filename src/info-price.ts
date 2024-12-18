@@ -1,7 +1,6 @@
 import { Bot, Context } from 'grammy';
 import { CoinGeckoService } from './coin-gecko.service';
-import { InfoType } from '.';
-import { tokenMapIds } from './models';
+import { tokenMapIds, InfoType } from './models';
 import { formattedPrice, trunkPrice } from './utilities';
 
 export class InfoPrice {
@@ -13,12 +12,11 @@ export class InfoPrice {
 
   getInfoAndReply() {
     this.bot.command(InfoType.INFO, async (ctx) => {
-      console.log(5500550055, ctx.message);
       if ( ctx.message ) {
         const idsFromMessage: string[] = ctx.message.text.split(/\s+/).slice(1);
         const idsToGetInfoFrom: string[] = [];
         idsFromMessage.forEach(textId => {
-          const matchedId = tokenMapIds.find(mapId => mapId.id === textId || mapId.symbol === textId)
+          const matchedId = tokenMapIds.find(mapId => mapId.id === textId || mapId.symbols.includes(textId))
           if ( matchedId ) {
             idsToGetInfoFrom.push(matchedId.id);
           } else {
@@ -30,7 +28,7 @@ export class InfoPrice {
             let replyFormatted = '';
             if ( resp.length ) {
               resp.forEach(coin => {
-                replyFormatted += `• *${coin.name}* (${coin.symbol}) at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n\n`;
+                replyFormatted += `• *${coin.name}* at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n\n`;
               });
               ctx.reply(replyFormatted, { parse_mode: 'Markdown' });
             }

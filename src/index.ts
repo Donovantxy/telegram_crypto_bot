@@ -3,29 +3,33 @@ import * as dotenv from 'dotenv';
 import { Alert } from './alert';
 import { CoinGeckoService } from './coin-gecko.service';
 import { InfoPrice } from './info-price';
-import express from 'express';
+import { AlertType } from './models';
 
 dotenv.config();
 
-export enum AlertType {
-  PRICE_ABOVE = 'above',
-  PRICE_BELOW = 'below',
-  GAS_PRICE = 'gas',
-  GAS_BELOW = 'gas_below',
-}
-
-export enum InfoType {
-  INFO = 'info',
-}
-
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
-console.log(222, process.env.TELEGRAM_BOT_TOKEN);
 
 const POLLING_TIME_IN_SEC = 5;
 const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);
 const alert = new Alert(bot, apiService);
 const info = new InfoPrice(bot, apiService);
 
+bot.command('help', (ctx) => {
+
+  ctx.reply(
+`
+*Command List*
+/info btc sol ada - prints the price, and market cap for the listed tokens
+/above (or below) - sets an alert which gets triggered whenever that condition is met\n
+*Links*
+**[Pulsechain](https://www.pulsechain.com/)**
+**[Hex](https://hex.com/links)**
+**[Ethereum Gas tracker](https://etherscan.io/gastracker)**
+**[CoinMarketCap](https://coinmarketcap.com/charts/)**
+`,
+{ parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
+
+});
 alert.setPriceAlert(AlertType.PRICE_ABOVE);
 alert.setPriceAlert(AlertType.PRICE_BELOW);
 info.getInfoAndReply();
@@ -42,16 +46,8 @@ info.getInfoAndReply();
 // });
 
 setInterval(async () => {
-  // alert.checkPricesAndReply();
+  alert.checkPricesAndReply();
 }, POLLING_TIME_IN_SEC * 1000); 
 
 bot.start();
-
-// const app = express();
-// app.use(express.json());
-// app.use(webhookCallback(bot, 'express'));
-
-// const port = Number(process.env.PORT) || 3000;
-// app.listen(port, () => {
-//   console.log(`Server is listening on port ${port}`);
-// });
+console.log('Bot is running...');
