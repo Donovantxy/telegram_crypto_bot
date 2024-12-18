@@ -16,7 +16,7 @@ export class Alert {
   }
 
   private _alerts!: AlertPool;
-  private _alertPoolFilePath = './src/alert_pool.json';
+  private _alertPoolFilePath = './alert_pool.json';
   private _tokenIdsAlert: string[] = [];
   
 
@@ -77,7 +77,7 @@ export class Alert {
   checkPricesAndReply() {
     try {
       const alertPoolFile: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
-      console.log(JSON.stringify(alertPoolFile, null, 3));
+      // console.log(JSON.stringify(alertPoolFile, null, 3));
       if ( alertPoolFile && alertPoolFile.priceAlerts && Object.keys(alertPoolFile.priceAlerts).length ) {
         this._coinGeckoService.getSimplePrice(Object.keys(alertPoolFile.priceAlerts), (prices: SimplePriceResp) => {
           if ( Object.keys(prices).length ) {

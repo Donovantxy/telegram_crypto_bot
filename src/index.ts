@@ -1,4 +1,4 @@
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InputFile } from 'grammy';
 import * as dotenv from 'dotenv';
 import { Alert } from './alert';
 import { CoinGeckoService } from './coin-gecko.service';
@@ -30,9 +30,12 @@ bot.command('help', (ctx) => {
 { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
 
 });
-bot.command('alerts', (ctx) => {
-  const fileContent = fs.readFileSync('./src/alert_pool.json', 'utf8');
-  ctx.reply(JSON.stringify(JSON.parse(fileContent), null, 2), { parse_mode: 'Markdown' });
+bot.command('alerts_', (ctx) => {
+  ctx.replyWithDocument(
+    new InputFile('./alert_pool.json'),
+    {
+      caption: 'Here is the current state of alert_pool.json.',
+    });
 });
 alert.setPriceAlert(AlertType.PRICE_ABOVE);
 alert.setPriceAlert(AlertType.PRICE_BELOW);

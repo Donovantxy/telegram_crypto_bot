@@ -1,1 +1,0 @@
-{"priceAlerts":{"bitcoin":{"alerts":[]},"ethereum":{"alerts":[]},"pulsechain":{"alerts":[]},"vechain":{"alerts":[{"type":"above","messageText":"/above vet 0.0546","tokenId":"vechain","targetPrice":0.0546,"chatId":51914389,"from":{"id":51914389,"is_bot":false,"first_name":"Fulvio","username":"FullView","language_code":"en"}}]}}}
