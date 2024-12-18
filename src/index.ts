@@ -45,13 +45,13 @@ setInterval(async () => {
   // alert.checkPricesAndReply();
 }, POLLING_TIME_IN_SEC * 1000); 
 
-// bot.start();
+bot.start();
 
-const app = express();
-app.use(express.json());
-app.use(webhookCallback(bot, 'express'));
+// const app = express();
+// app.use(express.json());
+// app.use(webhookCallback(bot, 'express'));
 
-const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+// const port = Number(process.env.PORT) || 3000;
+// app.listen(port, () => {
+//   console.log(`Server is listening on port ${port}`);
+// });

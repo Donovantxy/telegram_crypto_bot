@@ -1,1 +1,1 @@
-web: npm run build && npm run startd
+worker: npm run start
