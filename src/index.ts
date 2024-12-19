@@ -47,8 +47,7 @@ info.onGasPrice();
 
 setInterval(async () => {
   alert.onCheckPrices();
-// }, POLLING_TIME_IN_SEC * 1000); 
-}, 5 * 1000); 
+}, POLLING_TIME_IN_SEC * 1000);
 
 bot.start();
 console.log('Bot is running...');
