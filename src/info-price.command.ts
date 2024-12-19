@@ -1,13 +1,13 @@
 import { Bot, Context } from 'grammy';
-import { CoinGeckoService } from './coin-gecko.service';
-import { tokenMapIds, InfoType } from './models';
+import { ApiService } from './api.service';
+import { tokenMapIds, InfoType, GasOracleResponse } from './models';
 import { formattedPrice, trunkPrice } from './utilities';
 
 export class InfoPriceCommand {
 
   constructor(
     private bot: Bot<Context>,
-    private _coinGeckoService: CoinGeckoService
+    private _apiService: ApiService
   ) {}
 
   onTokenPrice() {
@@ -24,20 +24,20 @@ export class InfoPriceCommand {
           }
         });
         if ( idsToGetInfoFrom.length ) {
-          this._coinGeckoService.getCoinMarketData(idsToGetInfoFrom, (resp) => {
+          this._apiService.getCoinMarketData(idsToGetInfoFrom, (resp) => {
             let replyFormatted = '';
             if ( resp.length ) {
               resp.forEach(coin => {
-                replyFormatted += `• *${coin.name}* at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n\n`;
+                replyFormatted += `• *${coin.name}* at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n`;
               });
               ctx.reply(replyFormatted, { parse_mode: 'Markdown' });
             }
           });
         } else {
           if ( idsFromMessage.length === 1 ) {
-            ctx.reply(`@${ctx.from.username || ctx.from.first_name} *${idsFromMessage[0]}* is not found`, { parse_mode: 'Markdown' });
+            ctx.reply(`*${idsFromMessage[0]}* is not found`, { parse_mode: 'Markdown' });
           } else {
-            ctx.reply(`@${ctx.from.username || ctx.from.first_name} none of the coins are found`);
+            ctx.reply(`none of the coins are found`);
           }
         }
       }
@@ -45,7 +45,17 @@ export class InfoPriceCommand {
   }
 
   onGasPrice() {
-    
+    this.bot.command(InfoType.GWEI, async (ctx) => {
+      this._apiService.getEthGasOracle((res: GasOracleResponse) => {
+        if ( res.message === 'OK' ) {
+          let replyFormatted = '*Ethereum Gwei scan*\n';
+          replyFormatted += `*Low* ${Number(res.result.SafeGasPrice).toFixed(2)}\n`;
+          replyFormatted += `*Mid* ${Number(res.result.ProposeGasPrice).toFixed(2)}\n`;
+          replyFormatted += `*High* ${Number(res.result.FastGasPrice).toFixed(2)}\n`;
+          ctx.reply(replyFormatted, { parse_mode: 'Markdown' });
+        }
+      });
+    });
   }
 
 }

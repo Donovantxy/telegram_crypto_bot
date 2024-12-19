@@ -8,7 +8,7 @@ export enum AlertType {
   
 export enum InfoType {
   INFO = 'info',
-  GAS_PRICE = 'gas',
+  GWEI = 'gwei',
 }
 
 export interface AlertPool {
@@ -78,10 +78,24 @@ export interface CoinMarketDataResp {
   last_updated: string; // "2024-12-10T18:41:37.841Z"
 }
 
+export interface GasOracleResponse {
+  status: string, // number
+  message: string,
+  result: {
+    LastBlock: string, // number
+    SafeGasPrice: string, // number - in Gwei - low
+    ProposeGasPrice: string, // number - in Gwei - middle
+    FastGasPrice: string, // number - in Gwei - high
+    suggestBaseFee: string, // number - in Gwei
+    gasUsedRatio: string; // "0.486672,0.359059766666667,0.6722545,0.381628406527692,0.5149747"
+  }
+}
+
 export const tokenMapIds: TokenMapId[] = [
  { id: 'bitcoin', symbols: ['btc'] },
  { id: 'ethereum', symbols: ['eth'] },
  { id: 'pulsechain', symbols: ['pls'] },
+ { id: 'pulsex', symbols: ['plsx'] },
  { id: 'cardano', symbols: ['ada'] },
  { id: 'solana', symbols: ['sol'] },
  { id: 'vechain', symbols: ['vet'] },
@@ -95,5 +109,42 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'the-sandbox', symbols: ['sand'] },
  { id: 'crypto-com-chain', symbols: ['cro', 'cronos'] },
  { id: 'kaspa', symbols: ['kas'] },
+ { id: 'tether', symbols: ['usdt'] },
+ { id: 'binance-bridged-usdc-bnb-smart-chain', symbols: ['usdc'] },
+ { id: 'binance-peg-busd', symbols: ['busd'] },
+ { id: 'binancecoin', symbols: ['bnb'] },
+ { id: 'tron', symbols: ['trx'] },
+ { id: 'avalanche-2', symbols: ['avax'] },
+ { id: 'chainlink', symbols: ['link'] },
+ { id: 'shiba-inu', symbols: ['shib'] },
+ { id: 'polkadot', symbols: ['dot'] },
+ { id: 'hedera-hashgraph', symbols: ['hbar'] },
+ { id: 'uniswap', symbols: ['uni'] },
+ { id: 'near', symbols: ['near'] },
+ { id: 'fantom', symbols: ['ftm'] },
+ { id: 'cosmos', symbols: ['atom'] },
+ { id: 'injective-protocol', symbols: ['inj', 'injective'] },
+ { id: 'thorchain', symbols: ['rune'] },
+ { id: 'eos', symbols: ['eos'] },
+ { id: 'quant-network', symbols: ['qnt', 'quant'] },
+ { id: 'iota', symbols: ['iota'] },
+ { id: 'neo', symbols: ['neo'] },
+ { id: 'elrond-erd-2', symbols: ['egld'] },
+ { id: 'decentraland', symbols: ['mana'] },
+ { id: 'nexo', symbols: ['nexo'] },
+ { id: 'ftx-token', symbols: ['ftx'] },
+ { id: 'pancakeswap-token', symbols: ['cake'] },
+ { id: 'ronin', symbols: ['ron'] },
+ { id: 'oasis-network', symbols: ['rose', 'oasis'] },
+ { id: 'terra-luna', symbols: ['lunc', 'luna-classic', 'lunac'] },
+ { id: 'trust-wallet-token', symbols: ['twt'] },
+ { id: 'true-usd', symbols: ['tusd'] },
+ { id: 'dash', symbols: ['dash'] },
+ { id: 'nano', symbols: ['xno'] },
+ { id: 'ark', symbols: ['ark'] },
+ { id: 'xion-2', symbols: ['xion'] },
+ { id: 'dao-maker', symbols: ['dao'] },
+ { id: 'star-atlas', symbols: ['atlas'] },
+ { id: 'harmony', symbols: ['one'] },
 ];
 

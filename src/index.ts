@@ -1,9 +1,9 @@
 import { Bot, Context, InputFile } from 'grammy';
 import * as dotenv from 'dotenv';
 import { AlertCommand } from './alert.command';
-import { CoinGeckoService } from './coin-gecko.service';
+import { ApiService } from './api.service';
 import { InfoPriceCommand } from './info-price.command';
-import { AlertType } from './models';
+import { AlertType, GasOracleResponse } from './models';
 import { HelpCommand } from './help.command';
 
 dotenv.config();
@@ -11,7 +11,10 @@ dotenv.config();
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
 
 const POLLING_TIME_IN_SEC = 15;
-const apiService = new CoinGeckoService(process.env.COINGECKO_API_KEY as string);
+const apiService = new ApiService(
+  process.env.COINGECKO_API_KEY as string,
+  process.env.ETHERSCAN_API_KEY as string
+);
 const alert = new AlertCommand(bot, apiService);
 const info = new InfoPriceCommand(bot, apiService);
 const helpCommand = new HelpCommand(bot);
@@ -44,7 +47,8 @@ info.onGasPrice();
 
 setInterval(async () => {
   alert.onCheckPrices();
-}, POLLING_TIME_IN_SEC * 1000); 
+// }, POLLING_TIME_IN_SEC * 1000); 
+}, 5 * 1000); 
 
 bot.start();
 console.log('Bot is running...');
