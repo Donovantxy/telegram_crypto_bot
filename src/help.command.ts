@@ -2,9 +2,9 @@ import { Bot, Context } from 'grammy';
 
 /*
 Inline commands
-alerts - list of active alerts.
-gwei - lists the current low, mid, and high gwei values.
-help
+alerts - list of active alerts
+gwei - lists the current low, mid, and high gwei values
+help - list of commands, and useful links
 */
 
 export class HelpCommand {

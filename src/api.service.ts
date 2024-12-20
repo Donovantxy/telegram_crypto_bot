@@ -28,29 +28,29 @@ export class ApiService {
   }
 
 
-  getSimplePrice(tokenIds: string[], success: (res: SimplePriceResp) => void) {
-    const req = https.get(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenIds}&vs_currencies=usd&include_market_cap=true`,
-      this._options, res => {
-        const chunks: any = [];
-        res
-        .on('data', (chunk) => {
-          chunks.push(chunk);
-        })
-        .on('end', () => {
-          const body = Buffer.concat(chunks);
-          if ( body && JSON.parse(body.toString()) ) {
-            success(JSON.parse(body.toString()));
-          }
-        })
-        .on('error', err => {
-          console.error('API ERROR', err);
-        })
-      });
-    req.end();
-  }
+  // getSimplePrice(tokenIds: string[], success: (res: SimplePriceResp) => void) {
+  //   const req = https.get(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenIds.join(',')}&vs_currencies=usd&include_market_cap=true`,
+  //     this._options, res => {
+  //       const chunks: any = [];
+  //       res
+  //       .on('data', (chunk) => {
+  //         chunks.push(chunk);
+  //       })
+  //       .on('end', () => {
+  //         const body = Buffer.concat(chunks);
+  //         if ( body && JSON.parse(body.toString()) ) {
+  //           success(JSON.parse(body.toString()));
+  //         }
+  //       })
+  //       .on('error', err => {
+  //         console.error('API ERROR', err);
+  //       })
+  //     });
+  //   req.end();
+  // }
   
   getCoinMarketData(tokenIds: string[], success: (res: CoinMarketDataResp[]) => void) {
-    const req = https.get(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${tokenIds}`,
+    const req = https.get(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${tokenIds.join(',')}`,
       this._options, res => {
         const chunks: any = [];
         res

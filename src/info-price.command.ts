@@ -13,7 +13,7 @@ export class InfoPriceCommand {
   onTokenPrice() {
     this.bot.command(InfoType.INFO, async (ctx) => {
       if ( ctx.message ) {
-        const idsFromMessage: string[] = ctx.message.text.split(/\s+/).slice(1);
+        const idsFromMessage: string[] = ctx.message.text.split(/\s+/).slice(1).map(id => id.toLocaleLowerCase());
         const idsToGetInfoFrom: string[] = [];
         idsFromMessage.forEach(textId => {
           const matchedId = tokenMapIds.find(mapId => mapId.id === textId || mapId.symbols.includes(textId))

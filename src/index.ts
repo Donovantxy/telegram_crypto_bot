@@ -10,7 +10,7 @@ dotenv.config();
 
 const bot = new Bot<Context>(process.env.TELEGRAM_BOT_TOKEN as string);
 
-const POLLING_TIME_IN_SEC = 15;
+const POLLING_TIME_IN_SEC = 30;
 const apiService = new ApiService(
   process.env.COINGECKO_API_KEY as string,
   process.env.ETHERSCAN_API_KEY as string

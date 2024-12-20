@@ -105,7 +105,7 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'stellar', symbols: ['xlm'] },
  { id: 'dogecoin', symbols: ['doge'] },
  { id: 'hex', symbols: ['ehex'] },
- { id: 'hex-pulsechain', symbols: ['hex', 'phex'] },
+ { id: 'hex-pulsechain', symbols: ['phex'] },
  { id: 'the-sandbox', symbols: ['sand'] },
  { id: 'crypto-com-chain', symbols: ['cro', 'cronos'] },
  { id: 'kaspa', symbols: ['kas'] },

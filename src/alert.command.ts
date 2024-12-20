@@ -1,5 +1,5 @@
 import { Bot, Context } from 'grammy';
-import { AlertPool, GasOracleResponse, PriceAlert, SimplePrice, SimplePriceResp, tokenMapIds} from './models';
+import { AlertPool, CoinMarketDataResp, GasOracleResponse, PriceAlert, SimplePrice, SimplePriceResp, tokenMapIds} from './models';
 import * as fs from 'fs';
 import { ApiService } from './api.service';
 import { AlertType } from './models';
@@ -95,15 +95,17 @@ export class AlertCommand {
           }
         }
         if ( anyAlert ) {
-          this._apiService.getSimplePrice(Object.keys(alertPool.priceAlerts), (prices: SimplePriceResp) => {
-            if ( Object.keys(prices).length ) {
-              for ( const tokenKey of Object.keys(prices) ) {
-                if ( alertPool.priceAlerts[tokenKey] ) {
-                  for (let i=0; i<alertPool.priceAlerts[tokenKey].alerts.length;) {
-                    const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPool.priceAlerts[tokenKey].alerts[i]);
+          // this._apiService.getSimplePrice(Object.keys(alertPool.priceAlerts), (prices: SimplePriceResp) => {
+          this._apiService.getCoinMarketData(Object.keys(alertPool.priceAlerts), (prices: CoinMarketDataResp[]) => {
+            if ( prices.length ) {
+              const tokenKey = Object.keys(alertPool.priceAlerts);
+              for ( const price of prices ) {
+                if ( alertPool.priceAlerts[price.id] ) {
+                  for (let i=0; i<alertPool.priceAlerts[price.id].alerts.length;) {
+                    const gotTriggered = this.replyPriceAlert(price.current_price, alertPool.priceAlerts[price.id].alerts[i]);
                     if ( gotTriggered ) {
-                      alertPool.priceAlerts[tokenKey].alerts.splice(i, 1);
-                      if ( alertPool.priceAlerts[tokenKey].alerts.length === 0 ) {
+                      alertPool.priceAlerts[price.id].alerts.splice(i, 1);
+                      if ( alertPool.priceAlerts[price.id].alerts.length === 0 ) {
                         break;
                       }
                     } else {
@@ -114,11 +116,35 @@ export class AlertCommand {
               }
               try {
                 fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
-              } catch ( err ) {
+              } catch (err) {
                 console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
                 console.error(err);
               }
             }
+            // if ( Object.keys(prices).length ) {
+            //   for ( const tokenKey of Object.keys(prices) ) {
+            //     if ( alertPool.priceAlerts[tokenKey] ) {
+            //       for (let i=0; i<alertPool.priceAlerts[tokenKey].alerts.length;) {
+            //         const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPool.priceAlerts[tokenKey].alerts[i]);
+            //         if ( gotTriggered ) {
+            //           alertPool.priceAlerts[tokenKey].alerts.splice(i, 1);
+            //           if ( alertPool.priceAlerts[tokenKey].alerts.length === 0 ) {
+            //             break;
+            //           }
+            //         } else {
+            //           i++;
+            //         }
+            //       }
+            //     }
+            //   }
+            //   try {
+            //     console.log('write file', alertPool);
+            //     fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+            //   } catch ( err ) {
+            //     console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
+            //     console.error(err);
+            //   }
+            // }
           });
         }
         if ( alertPool.priceAlerts[this._GWEI_ID]?.alerts.length > 0 ) {
