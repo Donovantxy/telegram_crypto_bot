@@ -1,5 +1,5 @@
 import { Bot, Context } from 'grammy';
-import { AlertPool, CoinMarketDataResp, GasOracleResponse, PriceAlert, SimplePrice, SimplePriceResp, tokenMapIds} from './models';
+import { AlertPool, CoinMarketDataResp, GasOracleResponse, PriceAlert, tokenMapIds} from './models';
 import * as fs from 'fs';
 import { ApiService } from './api.service';
 import { AlertType } from './models';

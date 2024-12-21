@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { AlertCommand } from './alert.command';
 import { ApiService } from './api.service';
 import { InfoPriceCommand } from './info-price.command';
-import { AlertType, GasOracleResponse } from './models';
+import { AlertType } from './models';
 import { HelpCommand } from './help.command';
 
 dotenv.config();
@@ -32,7 +32,7 @@ alert.onSetPriceAlert(AlertType.PRICE_ABOVE);
 alert.onSetPriceAlert(AlertType.PRICE_BELOW);
 alert.onListAlerts();
 info.onTokenPrice();
-info.onGasPrice();
+info.onGweiValue();
 
 // bot.on('message', async (ctx) => {
 //   const countMember = await ctx.getChatMemberCount();

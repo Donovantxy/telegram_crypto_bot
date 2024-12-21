@@ -28,7 +28,7 @@ export class InfoPriceCommand {
             let replyFormatted = '';
             if ( resp.length ) {
               resp.forEach(coin => {
-                replyFormatted += `• *${coin.name}* at ${formattedPrice(coin.current_price)} - *MC* ${trunkPrice(coin.market_cap)}\n`;
+                replyFormatted += `• *${coin.name}* at ${formattedPrice(coin.current_price)} (${coin.price_change_percentage_24h.toFixed(2)}%) - *MC* ${trunkPrice(coin.market_cap)}\n`;
               });
               ctx.reply(replyFormatted, { parse_mode: 'Markdown' });
             }
@@ -44,7 +44,7 @@ export class InfoPriceCommand {
     });
   }
 
-  onGasPrice() {
+  onGweiValue() {
     this.bot.command(InfoType.GWEI, async (ctx) => {
       this._apiService.getEthGasOracle((res: GasOracleResponse) => {
         if ( res.message === 'OK' ) {
