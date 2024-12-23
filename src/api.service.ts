@@ -1,6 +1,5 @@
 import * as https from 'https';
 import { CoinMarketDataResp, GasOracleResponse, SimplePriceResp } from './models';
-import { ClientRequest } from 'http';
 
 export class ApiService {
 

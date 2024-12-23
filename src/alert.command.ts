@@ -116,6 +116,7 @@ export class AlertCommand {
               }
               try {
                 fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+                this._alerts = alertPool;
               } catch (err) {
                 console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
                 console.error(err);
@@ -150,13 +151,16 @@ export class AlertCommand {
         if ( alertPool.priceAlerts[this._GWEI_ID]?.alerts.length > 0 ) {
           this._apiService.getEthGasOracle((res: GasOracleResponse) => {
             if ( res.message === 'OK' ) {
-              for (let i=0; i < alertPool.priceAlerts[this._GWEI_ID].alerts.length; i++) {
+              for (let i=0; i < alertPool.priceAlerts[this._GWEI_ID].alerts.length;) {
                 const gotTriggered = this.replyPriceAlert(Number(res.result.ProposeGasPrice), alertPool.priceAlerts[this._GWEI_ID].alerts[i]);
                 if ( gotTriggered ) {
                   alertPool.priceAlerts[this._GWEI_ID].alerts.splice(i, 1);
+                } else {
+                  i++;
                 }
               }
               fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+              this._alerts = alertPool;
             }
           });
         }
