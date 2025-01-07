@@ -1,1 +1,130 @@
-{"priceAlerts":{"bitcoin":{"alerts":[{"type":"above","messageText":"/above btc 110000","tokenId":"bitcoin","targetPrice":110000,"chatId":-1001605797101,"from":{"id":51914389,"is_bot":false,"first_name":"Fulvio","username":"FullView","language_code":"en"}}]},"ripple":{"alerts":[{"type":"above","messageText":"/above xrp 2.9","tokenId":"ripple","targetPrice":2.9,"chatId":-1001605797101,"from":{"id":51914389,"is_bot":false,"first_name":"Fulvio","username":"FullView","language_code":"en"}}]},"ethereum":{"alerts":[{"type":"above","messageText":"/above eth 4600","tokenId":"ethereum","targetPrice":4600,"chatId":-1001605797101,"from":{"id":51914389,"is_bot":false,"first_name":"Fulvio","username":"FullView","language_code":"en"}}]},"pulsechain":{"alerts":[{"type":"above","messageText":"/above pls 0.00009","tokenId":"pulsechain","targetPrice":0.00009,"chatId":-1001605797101,"from":{"id":51914389,"is_bot":false,"first_name":"Fulvio","username":"FullView","language_code":"en"}}]},"gwei":{"alerts":[]}}}
+{
+  "priceAlerts": {
+    "bitcoin": {
+      "alerts": [
+        {
+          "type": "above",
+          "messageText": "/above btc 110000",
+          "tokenId": "bitcoin",
+          "targetPrice": 110000,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "ripple": {
+      "alerts": [
+        {
+          "type": "above",
+          "messageText": "/above xrp 3.3",
+          "tokenId": "ripple",
+          "targetPrice": 3.3,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "ethereum": {
+      "alerts": [
+        {
+          "type": "above",
+          "messageText": "/above eth 4600",
+          "tokenId": "ethereum",
+          "targetPrice": 4600,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "pulsechain": {
+      "alerts": [
+        {
+          "type": "above",
+          "messageText": "/above pls 0.00009",
+          "tokenId": "pulsechain",
+          "targetPrice": 0.00009,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "gwei": {
+      "alerts": [
+        {
+          "type": "below",
+          "messageText": "/below gas 6",
+          "tokenId": "gwei",
+          "targetPrice": 6,
+          "chatId": 51914389,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "cardano": {
+      "alerts": [
+        {
+          "type": "above",
+          "messageText": "/above ada 1.32",
+          "tokenId": "cardano",
+          "targetPrice": 1.32,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    },
+    "ftx-token": {
+      "alerts": [
+        {
+          "type": "below",
+          "messageText": "/below ftx-token 3.12",
+          "tokenId": "ftx-token",
+          "targetPrice": 3.12,
+          "chatId": -1001605797101,
+          "from": {
+            "id": 51914389,
+            "is_bot": false,
+            "first_name": "Fulvio",
+            "username": "FullView",
+            "language_code": "en"
+          }
+        }
+      ]
+    }
+  }
+}

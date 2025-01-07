@@ -17,7 +17,7 @@ export class HelpCommand {
     this.bot.command('help', (ctx) => {
       ctx.reply(
 `*Command List*
-/info btc sol ada - prints the price, and market cap for the listed tokens.
+/info btc sol ada - prints the price, 24h price change, and market cap for the listed tokens.
 /above (or below) - sets an alert which gets triggered whenever that condition is met. For Ethereum gwei you can use either *gas* or *gwei*.
 /alerts - list of active alerts.
 /gwei - lists the current low, mid, and high gwei values.

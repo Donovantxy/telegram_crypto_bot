@@ -41,40 +41,43 @@ export class AlertCommand {
             tokenId = this._GWEI_ID;
           } else {
             tokenId = tokenMapIds
-            .find(map => map.id === tokenSymbolOrId || map.symbols.includes(tokenSymbolOrId))?.id || tokenSymbolOrId;
+            .find(map => map.id === tokenSymbolOrId || map.symbols.includes(tokenSymbolOrId))?.id; // || tokenSymbolOrId;
           }
-          // check if an alert for a specific token already exist by a specific user
-          const existingAlert = this._alerts.priceAlerts[tokenId]?.alerts
-            .find(alert => alert.from?.id === ctx.from?.id && alert.type === command && alert.chatId === ctx.chatId);
-          if ( !existingAlert ) {
-            if ( !this._alerts.priceAlerts[tokenId] ) {
-              Object.assign(this._alerts.priceAlerts, {[tokenId]: {alerts: []}})
+
+          if ( tokenId ) {
+            // check if an alert for a specific token already exist by a specific user
+            const existingAlert = this._alerts.priceAlerts[tokenId]?.alerts
+              .find(alert => alert.from?.id === ctx.from?.id && alert.type === command && alert.chatId === ctx.chatId);
+            if ( !existingAlert ) {
+              if ( !this._alerts.priceAlerts[tokenId] ) {
+                Object.assign(this._alerts.priceAlerts, {[tokenId]: {alerts: []}})
+              }
+              this._alerts.priceAlerts[tokenId].alerts
+                .push(new PriceAlert(
+                  command,
+                  message?.text,
+                  tokenId,
+                  targetPrice,
+                  ctx.chatId,
+                  ctx.from,
+                ));
+            } else {
+              existingAlert.messageText = message?.text ?? '';
+              existingAlert.tokenId = tokenId;
+              existingAlert.targetPrice = targetPrice;
             }
-            this._alerts.priceAlerts[tokenId].alerts
-              .push(new PriceAlert(
-                command,
-                message?.text,
-                tokenId,
-                targetPrice,
-                ctx.chatId,
-                ctx.from,
-              ));
-          } else {
-            existingAlert.messageText = message?.text ?? '';
-            existingAlert.tokenId = tokenId;
-            existingAlert.targetPrice = targetPrice;
-          }
-        
-          try {
-            fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
-          } catch (err) {
-            console.error(err);
-          }
           
-          if ( tokenId === this._GWEI_ID ) {
-            ctx.reply(`*${tokenId.toLocaleUpperCase()}* alert is set for a value ${command} ${targetPrice.toFixed(2)}`, { parse_mode: 'Markdown' });
-          } else {
-            ctx.reply(`*${tokenSymbolOrId.toLocaleUpperCase()}* alert is set for a price ${command} ${formattedPrice(targetPrice)}`, { parse_mode: 'Markdown' });
+            try {
+              fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
+            } catch (err) {
+              console.error(err);
+            }
+            
+            if ( tokenId === this._GWEI_ID ) {
+              ctx.reply(`*${tokenId.toLocaleUpperCase()}* alert is set for a value ${command} ${targetPrice.toFixed(2)}`, { parse_mode: 'Markdown' });
+            } else {
+              ctx.reply(`*${tokenSymbolOrId.toLocaleUpperCase()}* alert is set for a price ${command} ${formattedPrice(targetPrice)}`, { parse_mode: 'Markdown' });
+            }
           }
         } else {
           ctx.reply(`Wrong alert format. Eg.: /above btc 65000, or /below cardano 1.25`);

@@ -146,6 +146,7 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'dao-maker', symbols: ['dao'] },
  { id: 'star-atlas', symbols: ['atlas'] },
  { id: 'harmony', symbols: ['one'] },
- { id: 'usual', symbols: ['usual'] }
+ { id: 'usual', symbols: ['usual'] },
+ { id: 'ftx-token', symbols: ['ftx', 'ftt'] }
 ];
 
