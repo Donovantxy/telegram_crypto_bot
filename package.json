@@ -16,17 +16,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@redis/graph": "^1.1.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "grammy": "^1.33.0"
+    "grammy": "^1.33.0",
+    "redis": "^4.7.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
+    "@grammyjs/types": "^3.17.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
-    "@grammyjs/types": "^3.17.0",
     "@uniswap/sdk": "^3.0.3",
     "ethers": "^6.13.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
   }
 }

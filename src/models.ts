@@ -3,6 +3,7 @@ import { User } from '@grammyjs/types';
 export enum AlertType {
   PRICE_ABOVE = 'above',
   PRICE_BELOW = 'below',
+  REMOVE_ALERT = 'remove',
   GAS_BELOW = 'gas_below',
 }
   
@@ -105,7 +106,7 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'stellar', symbols: ['xlm'] },
  { id: 'dogecoin', symbols: ['doge'] },
  { id: 'hex', symbols: ['ehex'] },
- { id: 'hex-pulsechain', symbols: ['phex'] },
+ { id: 'hex-pulsechain', symbols: ['phex', 'hex'] },
  { id: 'the-sandbox', symbols: ['sand'] },
  { id: 'crypto-com-chain', symbols: ['cro', 'cronos'] },
  { id: 'kaspa', symbols: ['kas'] },
@@ -114,7 +115,7 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'binance-peg-busd', symbols: ['busd'] },
  { id: 'binancecoin', symbols: ['bnb'] },
  { id: 'tron', symbols: ['trx'] },
- { id: 'avalanche-2', symbols: ['avax'] },
+ { id: 'avalanche-2', symbols: ['avax', 'avalanche'] },
  { id: 'chainlink', symbols: ['link'] },
  { id: 'shiba-inu', symbols: ['shib'] },
  { id: 'polkadot', symbols: ['dot'] },
@@ -132,7 +133,6 @@ export const tokenMapIds: TokenMapId[] = [
  { id: 'elrond-erd-2', symbols: ['egld', 'elrond'] },
  { id: 'decentraland', symbols: ['mana'] },
  { id: 'nexo', symbols: ['nexo'] },
- { id: 'ftx-token', symbols: ['ftx'] },
  { id: 'pancakeswap-token', symbols: ['cake', 'pancakeswap', 'pancake'] },
  { id: 'ronin', symbols: ['ron'] },
  { id: 'oasis-network', symbols: ['rose', 'oasis'] },

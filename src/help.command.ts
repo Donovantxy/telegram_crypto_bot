@@ -19,6 +19,7 @@ export class HelpCommand {
 `*Command List*
 /info btc sol ada - prints the price, 24h price change, and market cap for the listed tokens.
 /above (or below) - sets an alert which gets triggered whenever that condition is met. For Ethereum gwei you can use either *gas* or *gwei*.
+/remove - removes the alert(s) set by you on a specific chat/group.
 /alerts - list of active alerts.
 /gwei - lists the current low, mid, and high gwei values.
 /help\n

@@ -1,9 +1,10 @@
-import { Bot, Context } from 'grammy';
-import { AlertPool, CoinMarketDataResp, GasOracleResponse, PriceAlert, tokenMapIds} from './models';
+import { Bot, Context, InputFile } from 'grammy';
+import { AlertPool, CoinMarketDataResp, GasOracleResponse, InfoType, PriceAlert, tokenMapIds} from './models';
 import * as fs from 'fs';
 import { ApiService } from './api.service';
 import { AlertType } from './models';
 import { formattedPrice } from './utilities';
+import { RedisDb } from './rediscloud';
 
 export class AlertCommand {
   
@@ -23,12 +24,13 @@ export class AlertCommand {
 
   constructor(
     private bot: Bot<Context>,
-    private _apiService: ApiService
+    private _apiService: ApiService,
+    private _dbClient: RedisDb
   ) {
     this.init();
   }
 
-  onSetPriceAlert(command: AlertType) {
+  onSetPriceAlert(command: AlertType.PRICE_ABOVE | AlertType.PRICE_BELOW) {
     this.bot.command(command, async (ctx) => {
       const message = ctx.message
       const args = message?.text?.split(/\s+/ig);
@@ -47,7 +49,7 @@ export class AlertCommand {
           if ( tokenId ) {
             // check if an alert for a specific token already exist by a specific user
             const existingAlert = this._alerts.priceAlerts[tokenId]?.alerts
-              .find(alert => alert.from?.id === ctx.from?.id && alert.type === command && alert.chatId === ctx.chatId);
+              .find(alert => alert.from?.id === ctx.from?.id && alert.type === command && alert.chatId === ctx.chatId && alert.type === command);
             if ( !existingAlert ) {
               if ( !this._alerts.priceAlerts[tokenId] ) {
                 Object.assign(this._alerts.priceAlerts, {[tokenId]: {alerts: []}})
@@ -68,7 +70,8 @@ export class AlertCommand {
             }
           
             try {
-              fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
+              this._dbClient.storeAlert(this._alerts);
+              // fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
             } catch (err) {
               console.error(err);
             }
@@ -86,9 +89,37 @@ export class AlertCommand {
     });
   }
 
-  onCheckPrices() {
+  onRemoveAlert() {
+    this.bot.command(AlertType.REMOVE_ALERT, async (ctx) => {
+      const message = ctx.message
+      const args = message?.text?.split(/\s+/ig);
+      if ( args && args.length >= 2 ) {
+        const alertPool = await this._dbClient.getAlertPool();
+        args.slice(1).forEach(tokenId => {
+          const id = this.getTokenId(tokenId);
+          if ( id && alertPool.priceAlerts[id]) {
+            const alerts = alertPool.priceAlerts[id].alerts;
+            for ( let i=0; i<alerts.length; ) {
+              if ( alerts[0].chatId === ctx.chatId && alerts[0].from?.id === ctx.from?.id) {
+                const alert = alerts.splice(i, 1);
+                if ( alert[0] ) {
+                  ctx.reply(`Removed ${alert[0].messageText}`);
+                }
+              } else {
+                i++;
+              }
+            }
+          }
+        });
+        this._dbClient.storeAlert(alertPool);
+      }
+    });
+  }
+
+  async onCheckPrices() {
     try {
-      const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      // const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      const alertPool: AlertPool = await this._dbClient.getAlertPool();
       if ( alertPool && alertPool.priceAlerts && Object.keys(alertPool.priceAlerts).length ) {
         let anyAlert = false;
         for ( let tokenAlert of Object.values(alertPool.priceAlerts) ) {
@@ -98,7 +129,6 @@ export class AlertCommand {
           }
         }
         if ( anyAlert ) {
-          // this._apiService.getSimplePrice(Object.keys(alertPool.priceAlerts), (prices: SimplePriceResp) => {
           this._apiService.getCoinMarketData(Object.keys(alertPool.priceAlerts), (prices: CoinMarketDataResp[]) => {
             if ( prices.length ) {
               const tokenKey = Object.keys(alertPool.priceAlerts);
@@ -118,37 +148,14 @@ export class AlertCommand {
                 }
               }
               try {
-                fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+                this._dbClient.storeAlert(alertPool);
+                // fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
                 this._alerts = alertPool;
               } catch (err) {
                 console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
                 console.error(err);
               }
             }
-            // if ( Object.keys(prices).length ) {
-            //   for ( const tokenKey of Object.keys(prices) ) {
-            //     if ( alertPool.priceAlerts[tokenKey] ) {
-            //       for (let i=0; i<alertPool.priceAlerts[tokenKey].alerts.length;) {
-            //         const gotTriggered = this.replyPriceAlert(prices[tokenKey].usd, alertPool.priceAlerts[tokenKey].alerts[i]);
-            //         if ( gotTriggered ) {
-            //           alertPool.priceAlerts[tokenKey].alerts.splice(i, 1);
-            //           if ( alertPool.priceAlerts[tokenKey].alerts.length === 0 ) {
-            //             break;
-            //           }
-            //         } else {
-            //           i++;
-            //         }
-            //       }
-            //     }
-            //   }
-            //   try {
-            //     console.log('write file', alertPool);
-            //     fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
-            //   } catch ( err ) {
-            //     console.error('WRITE ALERTS_POOL AFTER CHECKING PRICEs');
-            //     console.error(err);
-            //   }
-            // }
           });
         }
         if ( alertPool.priceAlerts[this._GWEI_ID]?.alerts.length > 0 ) {
@@ -162,7 +169,8 @@ export class AlertCommand {
                   i++;
                 }
               }
-              fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
+              this._dbClient.storeAlert(alertPool);
+              // fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(alertPool));
               this._alerts = alertPool;
             }
           });
@@ -174,8 +182,9 @@ export class AlertCommand {
   }
 
   onListAlerts() {
-    this.bot.command('alerts', (ctx) => {
-      const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+    this.bot.command('alerts', async (ctx) => {
+      // const alertPool: AlertPool = JSON.parse(fs.readFileSync(this.alertPoolFilePath, 'utf8'));
+      const alertPool: AlertPool = await this._dbClient.getAlertPool();
       let reply = '*List Alerts*\n';
       Object.entries(alertPool.priceAlerts).forEach(entry => {
         for (const alert of entry[1].alerts) {
@@ -185,7 +194,7 @@ export class AlertCommand {
               reply += `${alert.type} `;
               reply += `${alert.targetPrice}\n`;
             } else {
-              reply += `• *${tokenMapIds.find(tm => tm.id === entry[0])?.symbols[0].toUpperCase() || alert.tokenId}* `;
+              reply += `• *${this.getTokenSymbolFromId(entry[0], alert.tokenId)}* `;
               reply += `${alert.type} `;
               reply += `${formattedPrice(alert.targetPrice)}\n`;
             }
@@ -196,30 +205,39 @@ export class AlertCommand {
     });
   }
 
-  private init() {
-    try {
-      const fileContent = fs.readFileSync(this._alertPoolFilePath, 'utf8');
-      if ( JSON.parse(fileContent) ) {
-        this._alerts = JSON.parse(fileContent);
-        const tokenIds = Object.keys(this._alerts.priceAlerts);
-        if ( tokenIds.length ) {
-          this._tokenIdsAlert = tokenIds;
-        }
-      } else {
-        this._alerts = { priceAlerts: { }}
-      }
-    } catch( err ) {
-      this._alerts = { priceAlerts: { }};
-      try {
-        fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  onListAlertFile() {
+    this.bot.command('alerts__', async (ctx) => {
+      // ctx.replyWithDocument(new InputFile('./alert_pool.json'),
+      const alerts = await this._dbClient.getAlertPool();
+      const buffer = Buffer.from(JSON.stringify(alerts), 'utf-8');
+      ctx.replyWithDocument(new InputFile(buffer, './alert_pool.json'),
+        {
+          caption: 'Here is the current state of alert_pool.json.',
+        });
+    });
   }
 
-  private storeAlert() {
-
+  private async init() {
+    this._alerts = await this._dbClient.getAlertPool();
+    // try {
+      // const fileContent = fs.readFileSync(this._alertPoolFilePath, 'utf8');
+      // if ( JSON.parse(fileContent) ) {
+      //   this._alerts = JSON.parse(fileContent);
+      //   const tokenIds = Object.keys(this._alerts.priceAlerts);
+      //   if ( tokenIds.length ) {
+      //     this._tokenIdsAlert = tokenIds;
+      //   }
+      // } else {
+      //   this._alerts = { priceAlerts: { }}
+      // }
+    // } catch( err ) {
+    //   this._alerts = { priceAlerts: { }};
+      // try {
+      //   fs.writeFileSync(this._alertPoolFilePath, JSON.stringify(this._alerts));
+      // } catch (err) {
+      //   console.error(err);
+      // }
+    // }
   }
 
   private replyPriceAlert(
@@ -228,7 +246,7 @@ export class AlertCommand {
   ): boolean {
     if ( priceAlert.type === AlertType.PRICE_ABOVE && currentPrice > priceAlert.targetPrice 
       || priceAlert.type === AlertType.PRICE_BELOW && currentPrice < priceAlert.targetPrice ) {
-      const tokenTitle = tokenMapIds.find(tokenMap => tokenMap.id === priceAlert.tokenId)?.symbols[0].toUpperCase() || priceAlert.tokenId;
+      const tokenTitle = this.getTokenSymbolFromId(priceAlert.tokenId, priceAlert.tokenId);
       let msgTag = priceAlert.from ? `${priceAlert.from.username || priceAlert.from.first_name}\n` : '';
       let msg = `${msgTag}`
       if ( tokenTitle === this._GWEI_ID ) {
@@ -240,6 +258,14 @@ export class AlertCommand {
       return true;
     }
     return false;
+  }
+
+  private getTokenSymbolFromId(id: string, alertTokenId: string) {
+    return tokenMapIds.find(tm => tm.id === id)?.symbols[0].toUpperCase() || alertTokenId;
+  }
+  
+  private getTokenId(tokenId: string): string | undefined {
+    return [InfoType.GWEI, 'gas'].includes(tokenId) ? InfoType.GWEI : tokenMapIds.find(tm => tm.id === tokenId || tm.symbols.indexOf(tokenId) > -1 )?.id;
   }
 
 }
