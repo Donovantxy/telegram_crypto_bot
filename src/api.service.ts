@@ -87,13 +87,12 @@ export class ApiService {
       2. Explain price movements using indicators like RSI, MACD, or Bollinger Bands.
       3. Offer short/long-term forecasts based on historical patterns (with clear disclaimers).
       4. Support top 50 cryptocurrencies (e.g., BTC, ETH, SOL, XRP).
-      5. Use Telegram-friendly formatting (bullet points, emojis, concise tables).
+      5. Use Telegram-friendly formatting (bullet points, emojis, concise tables). Parse_mode HTML, NOT Markdown or MarkdownV2
 
       Rules:
       - Allowed to provide financial advice but always include "This is not financial advice."
       - If data is outdated, say "As of [date], [coin] was priced at [price]."
       - For unknown coins: either print "I don't have data for [coin]. Try BTC, ETH, etc." or look crawl on web.
-      - Use a compatible text formatting with Telegram API where parse_mode is HTML
       - Use 📈📉🔥💎🚀 emojis for market sentiment.
       `;
 
