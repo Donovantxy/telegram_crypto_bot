@@ -93,8 +93,8 @@ export class ApiService {
       - Allowed to provide financial advice but always include "This is not financial advice."
       - If data is outdated, say "As of [date], [coin] was priced at [price]."
       - For unknown coins: either print "I don't have data for [coin]. Try BTC, ETH, etc." or look crawl on web.
+      - Use a compatible text formatting with Telegram API where parse_mode is HTML
       - Use 📈📉🔥💎🚀 emojis for market sentiment.
-      - User formatting compatible with Telegram bot in parse_mode HTML
       `;
 
     return openai.chat.completions.create({
