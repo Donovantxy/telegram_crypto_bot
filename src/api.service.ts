@@ -87,7 +87,8 @@ export class ApiService {
       2. Explain price movements using indicators like RSI, MACD, or Bollinger Bands.
       3. Offer short/long-term forecasts based on historical patterns (with clear disclaimers).
       4. Support top 50 cryptocurrencies (e.g., BTC, ETH, SOL, XRP).
-      5. Use Telegram-friendly formatting (bullet points, emojis, concise tables). Parse_mode HTML, NOT Markdown or MarkdownV2
+      5. Use Telegram-friendly formatting (bullet points, emojis, concise tables)
+      6. Use only Markdown (V1) formatting, neither HTML or MarkdownV2
 
       Rules:
       - Allowed to provide financial advice but always include "This is not financial advice."
