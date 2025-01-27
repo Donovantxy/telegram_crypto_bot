@@ -94,6 +94,7 @@ export class ApiService {
       - If data is outdated, say "As of [date], [coin] was priced at [price]."
       - For unknown coins: either print "I don't have data for [coin]. Try BTC, ETH, etc." or look crawl on web.
       - Use 📈📉🔥💎🚀 emojis for market sentiment.
+      - User formatting compatible with Telegram bot in parse_mode HTML
       `;
 
     return openai.chat.completions.create({
