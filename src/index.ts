@@ -5,7 +5,6 @@ import { ApiService } from './api.service';
 import { InfoPriceCommand } from './info-price.command';
 import { AlertType } from './models';
 import { HelpCommand } from './help.command';
-import { createClient } from 'redis';
 import { RedisDb } from './rediscloud';
 
 dotenv.config();
@@ -17,7 +16,8 @@ dbClient.connect().then(() => {
   const POLLING_TIME_IN_SEC = 30;
   const apiService = new ApiService(
     process.env.COINGECKO_API_KEY as string,
-    process.env.ETHERSCAN_API_KEY as string
+    process.env.ETHERSCAN_API_KEY as string,
+    process.env.DEEP_SEEK_API_KEY as string
   );
   const alert = new AlertCommand(bot, apiService, dbClient);
   const info = new InfoPriceCommand(bot, apiService);
@@ -26,6 +26,7 @@ dbClient.connect().then(() => {
   
   helpCommand.onHelp();
   alert.onListAlertFile();
+  alert.onDeepSeek();
   alert.onSetPriceAlert(AlertType.PRICE_ABOVE);
   alert.onSetPriceAlert(AlertType.PRICE_BELOW);
   alert.onRemoveAlert();
@@ -36,12 +37,12 @@ dbClient.connect().then(() => {
   // bot.on('message', async (ctx) => {
   //   const countMember = await ctx.getChatMemberCount();
   //   console.log(countMember, ctx.chat, ctx.chatId);
-  //   if ( ctx.chat.type === 'supergroup' ) {
-  //     if ( (ctx.message.text || '').includes(process.env.BOT_USERNAME!) ) {
-  //       ctx.reply(`Hello, I'm running...`);
-  //       ctx.reply(`Just for you to know, ${ctx.message.from.username}`);
-  //     }
-  //   }
+    // if ( ctx.chat.type === 'supergroup' && ) {
+    //   if ( (ctx.message.text || '').includes(process.env.BOT_USERNAME!) ) {
+    //     ctx.reply(`Hello, I'm running...`);
+    //     ctx.reply(`Just for you to know, ${ctx.message.from.username}`);
+    //   }
+    // }
   // });
   
   setInterval(async () => {

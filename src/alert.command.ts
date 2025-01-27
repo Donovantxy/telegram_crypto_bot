@@ -1,5 +1,5 @@
 import { Bot, Context, InputFile } from 'grammy';
-import { AlertPool, CoinMarketDataResp, GasOracleResponse, InfoType, PriceAlert, tokenMapIds} from './models';
+import { AlertPool, BotActions, CoinMarketDataResp, GasOracleResponse, InfoType, PriceAlert, tokenMapIds} from './models';
 import * as fs from 'fs';
 import { ApiService } from './api.service';
 import { AlertType } from './models';
@@ -210,10 +210,34 @@ export class AlertCommand {
       // ctx.replyWithDocument(new InputFile('./alert_pool.json'),
       const alerts = await this._dbClient.getAlertPool();
       const buffer = Buffer.from(JSON.stringify(alerts), 'utf-8');
-      ctx.replyWithDocument(new InputFile(buffer, './alert_pool.json'),
+      ctx.replyWithDocument(
+        new InputFile(buffer, './alert_pool.json'), 
         {
           caption: 'Here is the current state of alert_pool.json.',
-        });
+        }
+      );
+    });
+  }
+
+  onDeepSeek() {
+    this.bot.command('ds', async (ctx) => {
+      // restrictions: only for Investing4us, and Fulvio
+      if ( ctx.chat.id === -1001605797101 || ctx.from?.id === 51914389 ) {
+        if ( ctx.message?.text ) {
+          const query = ctx.message.text.split(/\/ds\s+/i)[1];
+          ctx.api.sendChatAction(ctx.chat!.id, BotActions.TYPING);
+          this._apiService.getDeepSeekRes(query)
+          .then(res => {
+            console.log(res.choices);
+            if ( res.choices.length && res.choices[0].message.content ) {
+              const answerContent = res.choices.reduce((prev, curr) => `${prev}\n${curr.message.content}\n\n`, '');
+              this.bot.api.sendMessage(ctx.chatId, answerContent, { parse_mode: 'HTML' } );
+            } else {
+              ctx.reply('Try again');
+            }
+          });
+        }
+      }
     });
   }
 

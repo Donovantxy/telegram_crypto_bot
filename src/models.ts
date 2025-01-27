@@ -33,6 +33,13 @@ export class PriceAlert {
   ) {}
 }
 
+export enum BotActions {
+  TYPING = 'typing',
+  RECORD_VOICE = 'record_voice',
+  UPLOAD_VIDEO = 'upload_video',
+  UPLOAD_DOCUMENT = 'upload_document',
+}
+
 export interface TokenMapId {
   id: string;
   symbols: string[];
