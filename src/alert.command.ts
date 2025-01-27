@@ -231,7 +231,7 @@ export class AlertCommand {
             console.log(res.choices);
             if ( res.choices.length && res.choices[0].message.content ) {
               const answerContent = res.choices.reduce((prev, curr) => `${prev}\n${curr.message.content}\n\n`, '');
-              this.bot.api.sendMessage(ctx.chatId, answerContent, { parse_mode: 'HTML' } );
+              this.bot.api.sendMessage(ctx.chatId, answerContent, { parse_mode: 'MarkdownV2' } );
             } else {
               ctx.reply('Try again');
             }
