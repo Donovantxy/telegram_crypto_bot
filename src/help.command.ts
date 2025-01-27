@@ -22,6 +22,7 @@ export class HelpCommand {
 /remove - removes the alert(s) set by you on a specific chat/group.
 /alerts - list of active alerts.
 /gwei - lists the current low, mid, and high gwei values.
+/ds - you can query DeepSeek on crypto market, price, and forecasts
 /help\n
 *Links*
 **[Bitcoin mempool explorer](https://mempool.space/)
